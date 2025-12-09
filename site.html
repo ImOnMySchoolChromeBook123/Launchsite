@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+<head>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌴</text></svg>">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oasis.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; /* gray-100 */
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #1f2937; /* gray-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8; /* slate-400 */
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #4b5563; /* gray-600 */
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* slate-500 */
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* gray-500 */
+        }
+        
+        /* --- FAVORITE ICON STYLES --- */
+        .favorite-btn {
+            color: #9ca3af; /* gray-400 */
+        }
+        .dark .favorite-btn {
+            color: #6b7280; /* gray-500 */
+        }
+        .favorite-btn:hover {
+            color: #6b7280; /* gray-500 */
+        }
+        .dark .favorite-btn:hover {
+             color: #9ca3af; /* gray-400 */
+        }
+        .favorite-btn.favorited,
+        .dark .favorite-btn.favorited {
+            color: #ef4444; /* red-500 */
+        }
+        .favorite-btn.favorited:hover,
+        .dark .favorite-btn.favorited:hover {
+            color: #dc2626; /* red-600 */
+        }
+
+        /* --- FILTER BUTTON STYLES --- */
+        .filter-btn {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #cbd5e1; /* slate-300 */
+            color: #374151; /* gray-700 */
+        }
+        .dark .filter-btn {
+            background-color: rgba(31, 41, 55, 0.9); /* gray-800/90 */
+            border: 1px solid #4b5563; /* gray-600 */
+            color: #d1d5db; /* gray-300 */
+        }
+        .filter-btn:hover {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+        .dark .filter-btn:hover {
+            background-color: #374151; /* gray-700 */
+        }
+        .filter-btn.active {
+            background-color: #3b82f6; /* blue-500 */
+            border-color: #2563eb; /* blue-600 */
+            color: white;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+        .dark .filter-btn.active {
+            background-color: #3b82f6; /* blue-500 */
+            border-color: #2563eb; /* blue-600 */
+            color: white;
+        }
+        .filter-btn.active:hover {
+            background-color: #2563eb; /* blue-600 */
+        }
+        .dark .filter-btn.active:hover {
+            background-color: #2563eb; /* blue-600 */
+        }
+
+        /* --- CATEGORY BADGES --- */
+        .category-badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            backdrop-filter: blur(4px);
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+            color: #0f172a; /* slate-900 */
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark body {
+            background-color: #0b1120;
+            color: #f1f5f9; /* slate-100 */
+        }
+        .backdrop-blur-sm {
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .app-card {
+            background-color: rgba(255, 255, 255, 0.7); /* white/70 */
+            border: 1px solid #cbd5e1; /* slate-300 */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .dark .app-card {
+            background-color: rgba(31, 41, 55, 0.7); /* gray-800/70 */
+            border: 1px solid rgba(55, 65, 81, 0.5); /* gray-700/50 */
+        }
+        .app-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .dark .app-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+        }
+        .popup-message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            font-size: 1rem;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease, top 0.3s ease;
+            pointer-events: none;
+        }
+        .popup-message.show {
+            opacity: 1;
+            top: 40px;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .recent-app-card {
+            width: 140px;
+            flex-shrink: 0;
+        }
+        .dark .recent-app-card {
+            background-color: rgba(31, 41, 55, 0.7);
+            border: 1px solid rgba(55, 65, 81, 0.5);
+        }
+        .recent-app-card {
+            background-color: rgba(255, 255, 255, 0.7);
+            border: 1px solid #cbd5e1;
+        }
+        .recent-app-card:hover {
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col">
+
+    <header class="sticky top-0 z-40 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700/50">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-center tracking-tight">
+            <svg class="w-full max-w-lg mx-auto" viewbox="0 0 100 20">
+              <defs>
+                <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="5%" stop-color="#007bff"/> 
+                  <stop offset="95%" stop-color="#007bff"/>
+                </linearGradient>
+                <pattern id="wave" x="0" y="0" width="120" height="20" patternUnits="userSpaceOnUse">
+                  <path id="wavePath" d="M-40 9 Q-30 7 -20 9 T0 9 T20 9 T40 9 T60 9 T80 9 T100 9 T120 9 V20 H-40z" mask="url(#mask)" fill="url(#gradient)"> 
+                    <animateTransform
+                        attributeName="transform"
+                        begin="0s"
+                        dur="1.5s"
+                        type="translate"
+                        from="0,0"
+                        to="40,0"
+                        repeatCount="indefinite" />
+                  </path>
+                </pattern>
+              </defs>
+              <text text-anchor="middle" x="50" y="15" font-size="17" fill="url(#wave)"  fill-opacity="0.6">Oasis.</text>
+              <text text-anchor="middle" x="50" y="15" font-size="17" class="fill-gray-900 dark:fill-white" fill-opacity="0.1">Oasis.</text> 
+            </svg>
+        </h1>
+    </header>
+
+    <main id="main-scroll-container" class="flex-grow overflow-y-auto px-4 sm:px-6 md:px-8 w-full">
+        
+        <section class="w-full max-w-[90%] xl:max-w-7xl mx-auto my-16">
+            <a href="#" id="featured-app-link" class="block relative w-full h-40 sm:h-48 md:h-60 rounded-lg overflow-hidden shadow-2xl group transition-all duration-300 transform hover:scale-[1.02]">
+                <div class="absolute inset-0 bg-cover bg-center transition-all duration-300 group-hover:blur-sm group-hover:scale-105" style="background-image: url('https://cdn2.steamgriddb.com/thumb/b23c20c5f2f8dfcfa596ce067954bdbe.jpg');"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                <div class="relative h-full flex flex-col justify-end p-4 sm:p-6 md:p-8">
+                    <span class="mb-2 inline-block bg-black/50 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider self-start">
+                        Featured game
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white shadow-lg">Granny</h2>
+                    <div class="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span class="inline-flex items-center bg-white/20 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded-full">
+                            Open Now
+                            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5l6 6-6 6M4.5 12h15" />
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </section>
+        
+        <nav class="w-full my-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="relative flex-grow">
+                    <input type="search" id="search-bar" placeholder="Search for games..." class="w-full pl-10 pr-4 py-3 bg-white/90 dark:bg-gray-800/90 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+                <!-- FAVORITES BUTTON -->
+                <button id="favorites-btn" class="filter-btn flex-shrink-0 px-4 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.218l-.022.012-.007.003z" />
+                    </svg>
+                    <span class="hidden sm:inline">Show Favorites</span>
+                </button>
+                <div class="relative">
+                    <select id="category-filter" class="w-full md:w-auto appearance-none pl-4 pr-10 py-3 bg-white/90 dark:bg-gray-800/90 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-full">
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 text-center md:text-left">
+                <span id="app-counter" class="text-gray-500 dark:text-gray-400 font-medium text-sm"></span>
+            </div>
+        </nav>
+
+        <section id="recently-used-section" class="w-full my-6 hidden">
+            <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Recently Used</h2>
+            <div id="recently-used-grid" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+            </div>
+        </section>
+
+        <div id="app-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4 sm:gap-6 pb-8">
+        </div>
+        <div id="no-results" class="hidden text-center text-gray-500 dark:text-gray-400 py-16">
+            <h3 class="text-2xl font-semibold">No games found</h3>
+            <p>Try adjusting your search or filter.</p>
+        </div>
+    </main>
+
+    <footer class="text-center py-4 mt-6 border-t border-gray-200 dark:border-gray-800/50">
+        <div class="flex justify-center items-center gap-4">
+            <p class="text-sm text-gray-500 dark:text-gray-500">&copy; 2025 Oasis. All rights reserved.</p>
+            
+            <button id="theme-toggle" class="p-2 rounded-full text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                <svg id="theme-icon-light" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M12 12a5 5 0 11-10 0 5 5 0 0110 0z" />
+                </svg>
+                <svg id="theme-icon-dark" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+            
+            <div class="powr-hit-counter" id="807693fa_1762561967"></div><script src="https://www.powr.io/powr.js?platform=html"></script>
+            
+        </div>
+    </footer>
+
+    <div id="popup-message" class="popup-message"></div>
+
+    <button id="jump-to-top" class="hidden fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-opacity duration-300 z-50">
+        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+        </svg>
+    </button>
+
+    <script>
+        let allApps = [];
+
+        let favorites = [];
+        const FAVORITES_KEY = 'oasisAppFavorites';
+        let recentlyUsed = [];
+        const RECENTLY_USED_KEY = 'oasisAppRecentlyUsed';
+        const MAX_RECENTLY_USED = 10; 
+
+        let currentFilteredApps = [];
+        let currentPage = 1;
+        const appsPerPage = 24;
+        let isLoading = false;
+
+        const appGrid = document.getElementById('app-grid');
+        const noResultsDiv = document.getElementById('no-results');
+        const searchBar = document.getElementById('search-bar');
+        const categoryFilter = document.getElementById('category-filter');
+        const mainScrollContainer = document.getElementById('main-scroll-container');
+        
+        let appCounter;
+        let jumpToTopBtn;
+        let themeToggleBtn; 
+        let themeIconLight; 
+        let themeIconDark; 
+        let recentlyUsedGrid;
+        let recentlyUsedSection;
+        let favoritesBtn; 
+
+        let popupTimeout;
+        function showPopupMessage(message) {
+            const popup = document.getElementById('popup-message');
+            if (!popup) return;
+            popup.textContent = message;
+            popup.classList.add('show');
+            if (popupTimeout) {
+                clearTimeout(popupTimeout);
+            }
+            popupTimeout = setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+
+        // --- NEW FUNCTION TO LAUNCH APP IN ABOUT:BLANK ---
+        function launchApp(url) {
+            // 1. Open the new window immediately to avoid popup blockers
+            const win = window.open('about:blank', '_blank');
+            
+            if (!win) {
+                showPopupMessage('Popup blocked! Please allow popups.');
+                return;
+            }
+
+            // Optional: Show a loading message in the new tab
+            win.document.write(`
+                <html>
+                    <body style="background:#111; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif;">
+                        <h2>Loading App...</h2>
+                    </body>
+                </html>
+            `);
+
+            // 2. Fetch the raw code
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(code => {
+                    // 3. Write the fetched code into the window
+                    win.document.open();
+                    win.document.write(code);
+                    win.document.close();
+                })
+                .catch(err => {
+                    console.error('Failed to load app:', err);
+                    win.document.body.innerHTML = "<h2 style='color:red; text-align:center; margin-top:20px;'>Failed to load app code.</h2>";
+                });
+        }
+
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                if (themeIconLight) { themeIconLight.classList.add('hidden'); }
+                if (themeIconDark) { themeIconDark.classList.remove('hidden'); }
+                localStorage.setItem('oasisTheme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                if (themeIconLight) { themeIconLight.classList.remove('hidden'); }
+                if (themeIconDark) { themeIconDark.classList.add('hidden'); }
+                localStorage.setItem('oasisTheme', 'light');
+            }
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('oasisTheme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme) {
+                setTheme(savedTheme);
+            } else {
+                setTheme('dark');
+            }
+        }
+
+        function loadFavorites() {
+            const favs = localStorage.getItem(FAVORITES_KEY);
+            favorites = favs ? JSON.parse(favs) : [];
+        }
+
+        function saveFavorites() {
+            localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+        }
+
+        function toggleFavorite(appId) {
+            const favIndex = favorites.indexOf(appId);
+            if (favIndex > -1) {
+                favorites.splice(favIndex, 1);
+            } else {
+                favorites.push(appId);
+            }
+            saveFavorites();
+
+            if (categoryFilter.value === 'favorites') {
+                updateFilterAndRender();
+            } else {
+                const card = appGrid.querySelector(`.app-card[data-id="${appId}"]`);
+                if (!card) return;
+
+                const btn = card.querySelector('.favorite-btn');
+                const isFavorite = favorites.includes(appId);
+                
+                const favoriteIcon = isFavorite
+                    ? `<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.218l-.022.012-.007.003z" /></svg>`
+                    : `<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>`;
+                
+                btn.innerHTML = favoriteIcon;
+                btn.classList.toggle('favorited', isFavorite);
+            }
+        }
+
+        function renderRecentlyUsed() {
+            if (!recentlyUsedGrid || !recentlyUsedSection) return;
+
+            const recentApps = recentlyUsed
+                .map(id => allApps.find(app => app.id === id))
+                .filter(app => app); 
+
+            if (recentApps.length === 0) {
+                recentlyUsedSection.classList.add('hidden');
+                return;
+            }
+
+            recentlyUsedSection.classList.remove('hidden');
+            recentlyUsedGrid.innerHTML = ''; 
+
+            const fragment = document.createDocumentFragment();
+            recentApps.forEach(app => {
+                const card = document.createElement('div');
+                card.className = 'recent-app-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-lg cursor-pointer flex flex-col';
+                card.dataset.id = app.id;
+
+                card.innerHTML = `
+                    <div class="relative w-full aspect-[4/3] bg-gray-200 dark:bg-gray-700">
+                        <img src="${app.thumbnail}" alt="${app.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://placehold.co/400x300/2a3b4c/ffffff?text=${encodeURIComponent(app.name)}'; this.onerror=null;">
+                    </div>
+                    <div class="p-2">
+                        <h3 class="font-semibold text-sm text-gray-900 dark:text-white truncate">${app.name}</h3>
+                    </div>
+                `;
+                fragment.appendChild(card);
+            });
+            recentlyUsedGrid.appendChild(fragment);
+        }
+
+        function loadRecentlyUsed() {
+            const recents = localStorage.getItem(RECENTLY_USED_KEY);
+            recentlyUsed = recents ? JSON.parse(recents) : [];
+        }
+
+        function saveRecentlyUsed() {
+            localStorage.setItem(RECENTLY_USED_KEY, JSON.stringify(recentlyUsed));
+        }
+
+        function addRecentlyUsed(appId) {
+            const existingIndex = recentlyUsed.indexOf(appId);
+            if (existingIndex > -1) {
+                recentlyUsed.splice(existingIndex, 1);
+            }
+            recentlyUsed.unshift(appId);
+            if (recentlyUsed.length > MAX_RECENTLY_USED) {
+                recentlyUsed = recentlyUsed.slice(0, MAX_RECENTLY_USED);
+            }
+            saveRecentlyUsed();
+            renderRecentlyUsed(); 
+        }
+
+        function populateCategories() {
+            const categories = [...new Set(allApps.map(app => app.category))];
+            categories.sort();
+            categoryFilter.innerHTML = `
+                <option value="all">All Categories</option>
+                <option value="favorites">Favorites</option>
+                <option value="recently">Recently Used</option>
+                ${categories.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+            `;
+        }
+
+        function handleNoResults() {
+            if (currentFilteredApps.length === 0) {
+                noResultsDiv.classList.remove('hidden');
+                appGrid.classList.add('hidden');
+            } else {
+                noResultsDiv.classList.add('hidden');
+                appGrid.classList.remove('hidden');
+            }
+        }
+
+        function updateFilterAndRender() {
+            const searchTerm = searchBar.value.toLowerCase();
+            const category = categoryFilter.value;
+
+            if (category !== 'favorites' && favoritesBtn) {
+                favoritesBtn.classList.remove('active');
+            }
+            if (category === 'favorites' && favoritesBtn) {
+                favoritesBtn.classList.add('active');
+            }
+
+            currentFilteredApps = allApps.filter(app => {
+                const categoryMatch = category === 'all' ||
+                                      (category === 'favorites' && favorites.includes(app.id)) ||
+                                      (category === 'recently' && recentlyUsed.includes(app.id)) ||
+                                      app.category === category;
+                const searchMatch = app.name.toLowerCase().includes(searchTerm);
+                return categoryMatch && searchMatch;
+            });
+
+            if (category === 'recently') {
+                currentFilteredApps.sort((a, b) => {
+                    return recentlyUsed.indexOf(a.id) - recentlyUsed.indexOf(b.id);
+                });
+            }
+
+            if (appCounter) {
+                appCounter.textContent = `${currentFilteredApps.length} ${currentFilteredApps.length === 1 ? 'game' : 'games'} found`;
+            }
+
+            appGrid.innerHTML = '';
+            currentPage = 1;
+            isLoading = false;
+            
+            renderPage(); 
+            handleNoResults();
+            
+            handleScroll();
+        }
+
+        function renderPage() {
+            if (isLoading) return; 
+            isLoading = true;
+
+            const startIndex = (currentPage - 1) * appsPerPage;
+            const endIndex = currentPage * appsPerPage;
+
+            const appsToShow = currentFilteredApps.slice(startIndex, endIndex);
+
+            if (appsToShow.length === 0) {
+                isLoading = false; 
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+
+            appsToShow.forEach(app => {
+                const isFavorite = favorites.includes(app.id);
+                const favoriteClass = isFavorite ? 'favorited' : '';
+                
+                const favoriteIcon = isFavorite
+                    ? `<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.218l-.022.012-.007.003z" /></svg>`
+                    : `<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>`;
+
+                // Determine badge color based on category
+                let badgeColor = 'rgba(100, 116, 139, 0.7)'; // Default slate
+                const cat = (app.category || '').toLowerCase();
+                if (cat.includes('arcade')) badgeColor = 'rgba(139, 92, 246, 0.7)'; // Violet
+                else if (cat.includes('racing')) badgeColor = 'rgba(239, 68, 68, 0.7)'; // Red
+                else if (cat.includes('shooter')) badgeColor = 'rgba(249, 115, 22, 0.7)'; // Orange
+                else if (cat.includes('puzzle') || cat.includes('strategy')) badgeColor = 'rgba(16, 185, 129, 0.7)'; // Emerald
+                else if (cat.includes('horror')) badgeColor = 'rgba(0, 0, 0, 0.8)'; // Black
+                else if (cat.includes('sports')) badgeColor = 'rgba(59, 130, 246, 0.7)'; // Blue
+
+                const card = document.createElement('div');
+                card.className = 'app-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-lg cursor-pointer flex flex-col';
+                card.dataset.id = app.id;
+                
+                card.innerHTML = `
+                    <div class="relative w-full aspect-[4/3] bg-gray-200 dark:bg-gray-700">
+                        <img src="${app.thumbnail}" alt="${app.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://placehold.co/400x300/2a3b4c/ffffff?text=${encodeURIComponent(app.name)}'; this.onerror=null;">
+                        <span class="absolute top-2 right-2 category-badge" style="background:${badgeColor}">${app.category || 'Game'}</span>
+                    </div>
+                    <div class="p-3 flex justify-between items-center mt-auto">
+                        <h3 class="font-semibold text-sm text-gray-900 dark:text-white truncate pr-2">${app.name}</h3>
+                        <button class="favorite-btn ${favoriteClass} transition-colors flex-shrink-0" data-id="${app.id}" title="Toggle Favorite">
+                            ${favoriteIcon}
+                        </button>
+                    </div>
+                `;
+                fragment.appendChild(card);
+            });
+
+            appGrid.appendChild(fragment);
+            currentPage++;
+            isLoading = false;
+        }
+
+        function handleScroll() {
+            const { scrollTop, clientHeight, scrollHeight } = mainScrollContainer;
+            if (scrollTop + clientHeight >= scrollHeight - 500) {
+                renderPage();
+            }
+
+            if (jumpToTopBtn) {
+                if (scrollTop > 300) { 
+                    jumpToTopBtn.classList.remove('hidden');
+                } else {
+                    jumpToTopBtn.classList.add('hidden');
+                }
+            }
+        }
+
+        function setupEventListeners() {
+            searchBar.addEventListener('input', () => {
+                if (favoritesBtn) {
+                    favoritesBtn.classList.remove('active');
+                }
+                if (categoryFilter.value === 'favorites') {
+                    categoryFilter.value = 'all';
+                }
+                updateFilterAndRender();
+            });
+            
+            categoryFilter.addEventListener('change', () => {
+                if (favoritesBtn) {
+                    favoritesBtn.classList.remove('active');
+                }
+                updateFilterAndRender();
+            });
+
+            if (favoritesBtn) {
+                favoritesBtn.addEventListener('click', () => {
+                    if (categoryFilter.value === 'favorites') {
+                        categoryFilter.value = 'all';
+                        favoritesBtn.classList.remove('active');
+                    } else {
+                        categoryFilter.value = 'favorites';
+                        favoritesBtn.classList.add('active');
+                    }
+                    updateFilterAndRender();
+                });
+            }
+
+            mainScrollContainer.addEventListener('scroll', handleScroll);
+
+            appGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.app-card'); 
+                if (!card) return; 
+
+                const favBtn = e.target.closest('.favorite-btn');
+                const appId = card.dataset.id;
+                
+                if (favBtn) {
+                    e.stopPropagation(); 
+                    toggleFavorite(appId);
+                } else {
+                    const app = allApps.find(g => g.id === appId);
+                    if (app && app.content) {
+                        addRecentlyUsed(app.id);
+                        launchApp(app.content); // Use the new launch function
+                    }
+                }
+            });
+
+            if (recentlyUsedGrid) {
+                recentlyUsedGrid.addEventListener('click', (e) => {
+                    const card = e.target.closest('.recent-app-card');
+                    if (!card) return;
+
+                    const appId = card.dataset.id;
+                    const app = allApps.find(g => g.id === appId);
+
+                    if (app && app.content) {
+                        addRecentlyUsed(app.id); 
+                        launchApp(app.content); // Use the new launch function
+                    }
+                });
+            }
+
+            if (jumpToTopBtn) {
+                jumpToTopBtn.addEventListener('click', () => {
+                    mainScrollContainer.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', () => {
+                    if (document.documentElement.classList.contains('dark')) {
+                        setTheme('light');
+                    } else {
+                        setTheme('dark');
+                    }
+                });
+            }
+        }
+
+        function initialize() {
+            appCounter = document.getElementById('app-counter');
+            jumpToTopBtn = document.getElementById('jump-to-top');
+            themeToggleBtn = document.getElementById('theme-toggle'); 
+            themeIconLight = document.getElementById('theme-icon-light'); 
+            themeIconDark = document.getElementById('theme-icon-dark'); 
+            recentlyUsedGrid = document.getElementById('recently-used-grid');
+            recentlyUsedSection = document.getElementById('recently-used-section');
+            favoritesBtn = document.getElementById('favorites-btn'); 
+            
+            loadTheme();
+            
+            const featuredAppLink = document.getElementById('featured-app-link');
+            const defaultFeaturedAppId = 'repo'; // Featured game stays 'repo'
+            const featuredApp = allApps.find(g => g.id === defaultFeaturedAppId); 
+
+            if (featuredApp && featuredAppLink) {
+                const featuredImageDiv = featuredAppLink.querySelector('.bg-cover');
+                const featuredTitle = featuredAppLink.querySelector('h2');
+
+                // Don't set direct href, handle click with launchApp
+                featuredAppLink.removeAttribute('href');
+                featuredAppLink.style.cursor = 'pointer';
+                
+                if (featuredImageDiv) {
+                    const imageUrl = featuredApp.bannerImage ? featuredApp.bannerImage : featuredApp.thumbnail;
+                    featuredImageDiv.style.backgroundImage = `url('${imageUrl}')`;
+                }
+                if (featuredTitle) {
+                    featuredTitle.textContent = featuredApp.name;
+                }
+                
+                featuredAppLink.addEventListener('click', (e) => {
+                    if (e.button === 0 && !e.ctrlKey && !e.metaKey) { 
+                        e.preventDefault(); 
+                        addRecentlyUsed(featuredApp.id);
+                        launchApp(featuredApp.content); // Use launch function here too
+                    }
+                });
+                featuredAppLink.classList.remove('hidden');
+            } else if (featuredAppLink) {
+                featuredAppLink.classList.add('hidden');
+            }
+
+            loadFavorites();
+            loadRecentlyUsed();
+            renderRecentlyUsed(); 
+            populateCategories();
+            setupEventListeners();
+            updateFilterAndRender(); 
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const appsListUrl = 'https://cdn.jsdelivr.net/gh/Blurtuz/assets2@refs/heads/main/games31.json';
+
+            fetch(appsListUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    if (!text) {
+                        throw new Error("The 'apps.json' file is empty.");
+                    }
+                    try {
+                        allApps = JSON.parse(text);
+                        initialize();
+                    } catch (e) {
+                        throw new Error(`Failed to parse JSON: ${e.message}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching app list:', error);
+                    const appGrid = document.getElementById('app-grid');
+                    const appCounter = document.getElementById('app-counter');
+                    
+                    if (appCounter) {
+                        appCounter.textContent = 'Error loading apps';
+                    }
+                    if (appGrid) {
+                        appGrid.innerHTML = 
+                            `<p class="col-span-full text-center text-red-500 font-semibold py-16">
+                                <strong class="text-xl block">Could not load app list.</strong>
+                                ${error.message}
+                            </p>`;
+                    }
+                    
+                    if (typeof allApps !== 'undefined' && allApps.length > 0) {
+                         console.log("Falling back to pre-loaded app list.");
+                         initialize();
+                    }
+                });
+        });
+    </script>
+</body>
+</html>
+
