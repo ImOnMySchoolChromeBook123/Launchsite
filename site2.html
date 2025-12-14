@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full dark">
+<head>
+    <link id="page-icon" rel="icon" href="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">My Drive - Google Drive</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        // Semantic colors that map to CSS variables
+                        t: {
+                            bg: 'var(--bg-color)',
+                            surface: 'var(--surface-color)',
+                            text: 'var(--text-color)',
+                            textMutated: 'var(--text-mutated)',
+                            border: 'var(--border-color)',
+                            accent: 'var(--accent-color)',
+                            accentHover: 'var(--accent-hover)',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            /* Default Light */
+            --bg-color: #f1f5f9;
+            --surface-color: rgba(255, 255, 255, 0.8);
+            --text-color: #0f172a;
+            --text-mutated: #64748b;
+            --border-color: #cbd5e1;
+            --accent-color: #3b82f6; /* blue-500 */
+            --accent-hover: #2563eb; /* blue-600 */
+            --favorite-color: #ef4444;
+        }
+
+        /* Dark Mode (Default Dark) */
+        html.dark {
+            --bg-color: #0b1120;
+            --surface-color: rgba(31, 41, 55, 0.7);
+            --text-color: #f1f5f9;
+            --text-mutated: #9ca3af;
+            --border-color: rgba(75, 85, 99, 0.5);
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+        }
+
+        /* Midnight Theme (Cyberpunk) */
+        html[data-theme="midnight"] {
+            --bg-color: #000000;
+            --surface-color: rgba(20, 20, 20, 0.9);
+            --text-color: #e2e8f0;
+            --text-mutated: #94a3b8;
+            --border-color: #333333;
+            --accent-color: #d946ef; /* fuchsia-500 */
+            --accent-hover: #c026d3;
+            --favorite-color: #d946ef;
+        }
+
+        /* Retro Theme (Terminal) */
+        html[data-theme="retro"] {
+            --bg-color: #0c0c0c;
+            --surface-color: rgba(0, 20, 0, 0.9);
+            --text-color: #4ade80; /* green-400 */
+            --text-mutated: #22c55e;
+            --border-color: #14532d;
+            --accent-color: #22c55e;
+            --accent-hover: #16a34a;
+            --favorite-color: #4ade80;
+        }
+
+        /* Ocean Theme */
+        html[data-theme="ocean"] {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.8);
+            --text-color: #e0f2fe; /* sky-100 */
+            --text-mutated: #94a3b8;
+            --border-color: #334155;
+            --accent-color: #0ea5e9; /* sky-500 */
+            --accent-hover: #0284c7;
+            --favorite-color: #38bdf8;
+        }
+
+        /* Crimson Theme (Red) - NEW */
+        html[data-theme="crimson"] {
+            --bg-color: #1a0505;
+            --surface-color: rgba(45, 10, 10, 0.8);
+            --text-color: #fecaca; /* red-200 */
+            --text-mutated: #f87171; /* red-400 */
+            --border-color: #7f1d1d;
+            --accent-color: #dc2626; /* red-600 */
+            --accent-hover: #b91c1c; /* red-700 */
+            --favorite-color: #ef4444;
+        }
+
+        /* --- GLOBAL STYLES --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-mutated); }
+
+        .backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+
+        /* --- COMPONENTS --- */
+        .glass-panel {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+        }
+
+        .app-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .app-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-color);
+        }
+
+        /* --- BUTTONS --- */
+        .action-btn {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+        .action-btn:hover {
+            border-color: var(--accent-color);
+        }
+        .action-btn.active {
+            background-color: var(--accent-color);
+            border-color: var(--accent-hover);
+            color: white;
+        }
+
+        .favorite-btn { color: var(--text-mutated); }
+        .favorite-btn:hover { color: var(--text-color); }
+        .favorite-btn.favorited { color: var(--favorite-color); }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .category-badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            backdrop-filter: blur(4px);
+            z-index: 10;
+        }
+
+        .popup-message {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background-color: var(--favorite-color); color: white;
+            padding: 12px 20px; border-radius: 8px; z-index: 2000;
+            font-weight: 500; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s, top 0.3s;
+        }
+        .popup-message.show { opacity: 1; top: 40px; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .recent-app-card {
+            width: 140px; flex-shrink: 0;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+        }
+        .recent-app-card:hover { transform: scale(1.03); }
+        
+        /* Theme Preview Circle */
+        .theme-preview { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--border-color); cursor: pointer; position: relative; }
+        .theme-preview.active::after {
+            content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-weight: bold;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col">
+
+    <header class="sticky top-0 z-40 py-6 glass-panel">
+        <div class="max-w-7xl mx-auto px-4 w-full flex items-center justify-between relative">
+            <!-- Invisible spacer to balance the layout -->
+            <div class="w-24"></div>
+
+            <h1 class="text-4xl md:text-5xl font-extrabold text-center tracking-tight absolute left-1/2 transform -translate-x-1/2 w-full pointer-events-none">
+                <svg class="w-full max-w-lg mx-auto" viewBox="0 0 100 24">
+                  <defs>
+                    <linearGradient id="gradient" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="5%" style="stop-color: var(--accent-color);"></stop> 
+                      <stop offset="95%" style="stop-color: var(--accent-color);"></stop>
+                    </linearGradient>
+                    <pattern id="wave" x="0" y="0" width="120" height="20" patternUnits="userSpaceOnUse">
+                      <path id="wavePath" d="M-40 15 Q-30 13 -20 15 T0 15 T20 15 T40 15 T60 15 T80 15 T100 15 T120 15 V20 H-40z" mask="url(#mask)" fill="url(#gradient)"> 
+                        <animateTransform attributeName="transform" begin="0s" dur="1.5s" type="translate" from="0,0" to="40,0" repeatCount="indefinite"></animateTransform>
+                      </path>
+                    </pattern>
+                  </defs>
+                  <text text-anchor="middle" x="50" y="19" font-size="17" fill="url(#wave)" fill-opacity="0.6">Oasis.</text>
+                  <text text-anchor="middle" x="50" y="19" font-size="17" class="fill-t-text" fill-opacity="0.1">Oasis.</text> 
+                </svg>
+            </h1>
+
+            <button id="settings-btn" class="flex items-center gap-2 px-4 py-2 rounded-full text-t-text hover:bg-t-border transition-colors z-50 border border-transparent hover:border-t-border" title="Settings">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="font-medium hidden sm:block">Themes</span>
+            </button>
+        </div>
+    </header>
+
+    <main id="main-scroll-container" class="flex-grow overflow-y-auto px-4 sm:px-6 md:px-8 w-full">
+        
+        <section class="w-full max-w-[90%] xl:max-w-7xl mx-auto my-16">
+            <a id="featured-app-link" class="block relative w-full h-40 sm:h-48 md:h-60 rounded-lg overflow-hidden shadow-2xl group transition-all duration-300 transform hover:scale-[1.02]" style="cursor: pointer;">
+                <div class="absolute inset-0 bg-cover bg-center transition-all duration-300 group-hover:blur-sm group-hover:scale-105" style="background-image: url('https://cdn.jsdelivr.net/gh/Blurtuz/images@latest/repo.png');"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+                <div class="relative h-full flex flex-col justify-end p-4 sm:p-6 md:p-8">
+                    <span class="mb-2 inline-block bg-black/50 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider self-start">
+                        Featured game
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white shadow-lg">Repo</h2>
+                    <div class="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span class="inline-flex items-center bg-white/20 backdrop-blur-sm text-white text-sm font-medium px-4 py-2 rounded-full border border-white/30">
+                            Play Now
+                            <svg class="w-4 h-4 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5l6 6-6 6M4.5 12h15"></path>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </section>
+        
+        <nav class="w-full my-6">
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="relative flex-grow">
+                    <input type="search" id="search-bar" placeholder="Search for games..." class="w-full pl-10 pr-4 py-3 bg-t-surface backdrop-blur-sm border border-t-border text-t-text rounded-lg focus:outline-none focus:ring-2 focus:ring-t-accent focus:border-t-accent shadow-sm transition-all duration-200">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-t-textMutated" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <button id="favorites-btn" class="action-btn flex-shrink-0 px-4 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2 shadow-sm">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.218l-.022.012-.007.003z"></path>
+                    </svg>
+                    <span class="hidden sm:inline">Show Favorites</span>
+                </button>
+                <div class="relative">
+                    <select id="category-filter" class="w-full md:w-auto appearance-none pl-4 pr-10 py-3 bg-t-surface backdrop-blur-sm border border-t-border text-t-text rounded-lg focus:outline-none focus:ring-2 focus:ring-t-accent focus:border-t-accent h-full shadow-sm cursor-pointer">
+                        <option value="all">All Categories</option>
+                        <option value="favorites">Favorites</option>
+                        <option value="recently">Recently Played</option>
+                        <option value="Adventure">Adventure</option>
+                        <option value="Apps">Apps</option>
+                        <option value="Arcade">Arcade</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Racing">Racing</option>
+                        <option value="Rhythm">Rhythm</option>
+                        <option value="Sandbox">Sandbox</option>
+                        <option value="Shooter">Shooter</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Strategy">Strategy</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-t-textMutated" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 text-center md:text-left">
+                <span id="app-counter" class="text-t-textMutated font-medium text-sm">Loading games...</span>
+            </div>
+        </nav>
+
+        <section id="recently-played-section" class="w-full my-6 hidden">
+            <h2 class="text-2xl font-bold mb-4 text-t-text">Recently Played</h2>
+            <div id="recently-played-grid" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                <!-- Recently played items will be injected here -->
+            </div>
+        </section>
+
+        <div id="app-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4 sm:gap-6 pb-8">
+            <!-- Game cards will be injected here -->
+        </div>
+        
+        <div id="no-results" class="text-center text-t-textMutated py-16 hidden">
+            <h3 class="text-2xl font-semibold">No games found</h3>
+            <p>Try adjusting your search or filter.</p>
+        </div>
+    </main>
+
+    <footer class="text-center py-4 mt-6 glass-panel">
+        <div class="flex justify-center items-center gap-4">
+            <p class="text-sm text-t-textMutated">© 2025 Oasis Games. All rights reserved.</p>
+            <div class="powr-hit-counter" id="807693fa_1762561967"></div>
+        </div>
+    </footer>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="fixed inset-0 modal-overlay z-50 flex items-center justify-center p-4 hidden">
+        <div class="modal-content w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform transition-all scale-100">
+            <div class="p-6 border-b border-t-border flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Settings</h2>
+                <button id="close-settings" class="text-t-textMutated hover:text-t-text">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-8 overflow-y-auto max-h-[70vh]">
+                <!-- THEME SECTION -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Theme</h3>
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="theme-preview bg-white" data-theme="light"></div>
+                            <span class="text-xs">Classic</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="theme-preview bg-gray-900 active" data-theme="dark"></div>
+                            <span class="text-xs">Dark</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="theme-preview bg-black border-fuchsia-500" data-theme="midnight" style="border-color: #d946ef;"></div>
+                            <span class="text-xs">Midnight</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2">
+                            <div class="theme-preview bg-slate-900 border-sky-500" data-theme="ocean" style="border-color: #0ea5e9;"></div>
+                            <span class="text-xs">Ocean</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 mt-2">
+                            <div class="theme-preview bg-black border-green-500" data-theme="retro" style="border-color: #22c55e;"></div>
+                            <span class="text-xs">Retro</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 mt-2">
+                            <div class="theme-preview bg-black border-red-600" data-theme="crimson" style="border-color: #dc2626;"></div>
+                            <span class="text-xs">Crimson</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CLOAKING SECTION -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Tab Cloaking</h3>
+                    <p class="text-xs text-t-textMutated mb-3">Changes tab name and icon to look like another site.</p>
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <button class="cloak-btn action-btn px-3 py-1 rounded text-sm" data-type="drive">Google Drive</button>
+                        <button class="cloak-btn action-btn px-3 py-1 rounded text-sm" data-type="classroom">Classroom</button>
+                        <button class="cloak-btn action-btn px-3 py-1 rounded text-sm" data-type="wikipedia">Wikipedia</button>
+                        <button class="cloak-btn action-btn px-3 py-1 rounded text-sm" data-type="reset">Reset</button>
+                    </div>
+                </div>
+
+                <!-- PANIC BUTTON SECTION -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Panic Button</h3>
+                    <p class="text-xs text-t-textMutated mb-3">Press this key to instantly redirect to a safe site.</p>
+                    
+                    <label class="text-xs font-semibold uppercase text-t-textMutated block mb-1">Trigger Key</label>
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="panic-key-input" placeholder="Click to set key..." readonly="" class="w-full px-4 py-2 bg-t-bg border border-t-border rounded-lg text-center cursor-pointer focus:border-t-accent focus:outline-none">
+                        <button id="save-panic-key" class="action-btn px-4 py-2 rounded-lg">Save</button>
+                    </div>
+                    <p class="text-xs text-t-textMutated mb-4">Current Key: <span id="current-panic-key" class="font-bold text-t-text">~</span></p>
+
+                    <label class="text-xs font-semibold uppercase text-t-textMutated block mb-1">Redirect URL</label>
+                    <div class="flex gap-2">
+                        <input type="url" id="panic-url-input" placeholder="https://drive.google.com" class="w-full px-4 py-2 bg-t-bg border border-t-border rounded-lg text-t-text focus:border-t-accent focus:outline-none">
+                        <button id="save-panic-url" class="action-btn px-4 py-2 rounded-lg">Save</button>
+                    </div>
+                    
+                    <p class="text-xs text-t-textMutated italic mt-3 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        This button will also work inside of games.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="popup-message" class="popup-message">Cloak updated!</div>
+
+    <button id="jump-to-top" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg transition-opacity duration-300 z-50 hidden">
+        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"></path>
+        </svg>
+    </button>
+    
+    <!-- Power Hit Counter Script -->
+    <script src="https://www.powr.io/powr.js?platform=html"></script>
+
+    <script>
+        let allApps = [];
+        let favorites = [];
+        const FAVORITES_KEY = 'oasisGameFavorites';
+        let recentlyPlayed = [];
+        const RECENTLY_PLAYED_KEY = 'oasisGameRecentlyPlayed';
+        const MAX_RECENTLY_PLAYED = 10; 
+
+        // Settings State
+        let currentTheme = localStorage.getItem('oasisTheme') || 'dark';
+        let panicKey = localStorage.getItem('oasisPanicKey') || '~';
+        let panicUrl = localStorage.getItem('oasisPanicUrl') || 'https://drive.google.com';
+        let cloakData = JSON.parse(localStorage.getItem('oasisCloak')) || { title: 'Oasis Games', icon: '' };
+
+        // Cloak Presets
+        const CLOAK_PRESETS = {
+            drive: { title: 'My Drive - Google Drive', icon: 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png' },
+            classroom: { title: 'Home', icon: 'https://ssl.gstatic.com/classroom/favicon.png' },
+            wikipedia: { title: 'Wikipedia', icon: 'https://en.wikipedia.org/static/favicon/wikipedia.ico' },
+            reset: { title: 'Oasis Games', icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌴</text></svg>' }
+        };
+
+        let currentFilteredApps = [];
+        let currentPage = 1;
+        const appsPerPage = 24;
+        let isLoading = false;
+
+        const appGrid = document.getElementById('app-grid');
+        const noResultsDiv = document.getElementById('no-results');
+        const searchBar = document.getElementById('search-bar');
+        const categoryFilter = document.getElementById('category-filter');
+        const mainScrollContainer = document.getElementById('main-scroll-container');
+        
+        let appCounter;
+        let jumpToTopBtn;
+        let recentlyPlayedGrid;
+        let recentlyPlayedSection;
+        let favoritesBtn; 
+
+        // Modal Elements
+        const settingsModal = document.getElementById('settings-modal');
+        const settingsBtn = document.getElementById('settings-btn');
+        const closeSettingsBtn = document.getElementById('close-settings');
+        const themePreviews = document.querySelectorAll('.theme-preview');
+        const cloakBtns = document.querySelectorAll('.cloak-btn');
+        const panicInput = document.getElementById('panic-key-input');
+        const savePanicBtn = document.getElementById('save-panic-key');
+        const currentPanicKeyDisplay = document.getElementById('current-panic-key');
+        const panicUrlInput = document.getElementById('panic-url-input');
+        const savePanicUrlBtn = document.getElementById('save-panic-url');
+
+        let popupTimeout;
+        function showPopupMessage(message) {
+            const popup = document.getElementById('popup-message');
+            if (!popup) return;
+            popup.textContent = message;
+            popup.classList.add('show');
+            if (popupTimeout) clearTimeout(popupTimeout);
+            popupTimeout = setTimeout(() => { popup.classList.remove('show'); }, 3000);
+        }
+
+        // --- LAUNCH APP (UPDATED FOR CLOAKING) ---
+        function launchApp(url) {
+            const win = window.open('about:blank', '_blank');
+            if (!win) {
+                showPopupMessage('Popup blocked! Please allow popups.');
+                return;
+            }
+
+            // Inject Cloak Data immediately into the new window
+            const cloakTitle = cloakData.title || "Oasis Games";
+            const cloakIcon = cloakData.icon || "";
+
+            win.document.write(`
+                <html>
+                    <head>
+                        <title>${cloakTitle}</title>
+                        <link rel="icon" href="${cloakIcon}">
+                    </head>
+                    <body style="background:#111; color:#fff; display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; margin:0;">
+                        <h2>LOADING...</h2>
+                    </body>
+                </html>
+            `);
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.text();
+                })
+                .then(code => {
+                    win.document.open();
+                    win.document.write(code);
+                    
+                    // Cloak Script Injection
+                    const cloakScript = `<script>document.title = "${cloakTitle}"; var link = document.querySelector("link[rel~='icon']"); if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.getElementsByTagName('head')[0].appendChild(link); } link.href = "${cloakIcon}";<\/script>`;
+                    win.document.write(cloakScript);
+
+                    // Panic Script Injection
+                    const panicScript = `<script>
+                        window.addEventListener('keydown', function(e) {
+                            if (e.key === "${panicKey}") {
+                                window.location.href = "${panicUrl}";
+                            }
+                        });
+                    <\/script>`;
+                    win.document.write(panicScript);
+
+                    win.document.close();
+                })
+                .catch(err => {
+                    console.error('Failed to load app:', err);
+                    win.document.body.innerHTML = "<h2 style='color:red; text-align:center; margin-top:20px;'>Failed to load game code.</h2>";
+                });
+        }
+
+        // --- THEMING LOGIC ---
+        function applyTheme(theme) {
+            document.documentElement.className = 'h-full'; // Reset
+            document.documentElement.removeAttribute('data-theme');
+            
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else if (theme === 'light') {
+                // Default light, no class needed
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+                // Also add dark class to these themes to trigger dark mode tailwind utilities for things not covered by vars
+                document.documentElement.classList.add('dark'); 
+            }
+            
+            localStorage.setItem('oasisTheme', theme);
+            
+            // Update active state in modal
+            themePreviews.forEach(p => {
+                p.classList.remove('active');
+                if (p.dataset.theme === theme) p.classList.add('active');
+            });
+        }
+
+        // --- CLOAKING LOGIC ---
+        function applyCloak(data) {
+            document.title = data.title;
+            const icon = document.getElementById('page-icon');
+            if (icon) icon.href = data.icon;
+            localStorage.setItem('oasisCloak', JSON.stringify(data));
+            cloakData = data;
+        }
+
+        // --- PANIC BUTTON LOGIC ---
+        function handlePanic(e) {
+            if (e.key === panicKey) {
+                window.location.href = panicUrl;
+            }
+        }
+
+        // --- CORE FUNCTIONS ---
+        function loadFavorites() {
+            const favs = localStorage.getItem(FAVORITES_KEY);
+            favorites = favs ? JSON.parse(favs) : [];
+        }
+
+        function saveFavorites() {
+            localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+        }
+
+        function toggleFavorite(appId) {
+            const favIndex = favorites.indexOf(appId);
+            if (favIndex > -1) {
+                favorites.splice(favIndex, 1);
+            } else {
+                favorites.push(appId);
+            }
+            saveFavorites();
+
+            if (categoryFilter.value === 'favorites') {
+                updateFilterAndRender();
+            } else {
+                const card = appGrid.querySelector(`.app-card[data-id="${appId}"]`);
+                if (!card) return;
+                const btn = card.querySelector('.favorite-btn');
+                const isFavorite = favorites.includes(appId);
+                const favoriteIcon = isFavorite
+                    ? `<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.218l-.022.012-.007.003z" /></svg>`
+                    : `<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>`;
+                btn.innerHTML = favoriteIcon;
+                btn.classList.toggle('favorited', isFavorite);
+            }
+        }
+
+        function renderRecentlyPlayed() {
+            if (!recentlyPlayedGrid || !recentlyPlayedSection) return;
+            const recentApps = recentlyPlayed.map(id => allApps.find(app => app.id === id)).filter(app => app); 
+            if (recentApps.length === 0) {
+                recentlyPlayedSection.classList.add('hidden');
+                return;
+            }
+            recentlyPlayedSection.classList.remove('hidden');
+            recentlyPlayedGrid.innerHTML = ''; 
+            const fragment = document.createDocumentFragment();
+            recentApps.forEach(app => {
+                const card = document.createElement('div');
+                card.className = 'recent-app-card rounded-lg overflow-hidden shadow-lg transition-all duration-300 hover:shadow-lg cursor-pointer flex flex-col';
+                card.dataset.id = app.id;
+                card.innerHTML = `
+                    <div class="relative w-full aspect-[4/3] bg-gray-200 dark:bg-gray-700">
+                        <img src="${app.thumbnail}" alt="${app.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://placehold.co/400x300/2a3b4c/ffffff?text=${encodeURIComponent(app.name)}'; this.onerror=null;">
+                        <span class="absolute top-1 right-1 category-badge">${app.category}</span>
+                    </div>
+                    <div class="p-2">
+                        <h3 class="font-semibold text-sm text-t-text truncate">${app.name}</h3>
+                    </div>
+                `;
+                fragment.appendChild(card);
+            });
+            recentlyPlayedGrid.appendChild(fragment);
+        }
+
+        function loadRecentlyPlayed() {
+            const recents = localStorage.getItem(RECENTLY_PLAYED_KEY);
+            recentlyPlayed = recents ? JSON.parse(recents) : [];
+        }
+
+        function saveRecentlyPlayed() {
+            localStorage.setItem(RECENTLY_PLAYED_KEY, JSON.stringify(recentlyPlayed));
+        }
+
+        function addRecentlyPlayed(appId) {
+            const existingIndex = recentlyPlayed.indexOf(appId);
+            if (existingIndex > -1) recentlyPlayed.splice(existingIndex, 1);
+            recentlyPlayed.unshift(appId);
+            if (recentlyPlayed.length > MAX_RECENTLY_PLAYED) recentlyPlayed = recentlyPlayed.slice(0, MAX_RECENTLY_PLAYED);
+            saveRecentlyPlayed();
+            renderRecentlyPlayed(); 
+        }
+
+        function populateCategories() {
+            const categories = [...new Set(allApps.map(app => app.category))];
+            categories.sort();
+            // Don't overwrite the hardcoded favorites/recents, just append the dynamic ones or replace the dynamic part.
+            // For simplicity in this fix, we will keep the hardcoded ones and just ensure logic works.
+            // If you want dynamic categories from JSON:
+            /*
+            categoryFilter.innerHTML = `
+                <option value="all">All Categories</option>
+                <option value="favorites">Favorites</option>
+                <option value="recently">Recently Played</option>
+                ${categories.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+            `;
+            */
+        }
+
+        function handleNoResults() {
+            if (currentFilteredApps.length === 0) {
+                noResultsDiv.classList.remove('hidden');
+                appGrid.classList.add('hidden');
+            } else {
+                noResultsDiv.classList.add('hidden');
+                appGrid.classList.remove('hidden');
+            }
+        }
+
+        function updateFilterAndRender() {
+            const searchTerm = searchBar.value.toLowerCase();
+            const category = categoryFilter.value;
+
+            if (category !== 'favorites' && favoritesBtn) favoritesBtn.classList.remove('active');
+            if (category === 'favorites' && favoritesBtn) favoritesBtn.classList.add('active');
+
+            currentFilteredApps = allApps.filter(app => {
+                const categoryMatch = category === 'all' ||
+                                      (category === 'favorites' && favorites.includes(app.id)) ||
+                                      (category === 'recently' && recentlyPlayed.includes(app.id)) ||
+                                      app.category === category;
+                const searchMatch = app.name.toLowerCase().includes(searchTerm);
+                return categoryMatch && searchMatch;
+            });
+
+            if (category === 'recently') {
+                currentFilteredApps.sort((a, b) => {
+                    return recentlyPlayed.indexOf(a.id) - recentlyPlayed.indexOf(b.id);
+                });
+            }
+
+            if (appCounter) appCounter.textContent = `${currentFilteredApps.length} ${currentFilteredApps.length === 1 ? 'game' : 'games'} found`;
+
+            appGrid.innerHTML = '';
+            currentPage = 1;
+            isLoading = false;
+            
+            renderPage(); 
+            handleNoResults();
+            handleScroll();
+        }
+
+        function renderPage() {
+            if (isLoading) return; 
+            isLoading = true;
+
+            const startIndex = (currentPage - 1) * appsPerPage;
+            const endIndex = currentPage * appsPerPage;
+            const appsToShow = currentFilteredApps.slice(startIndex, endIndex);
+
+            if (appsToShow.length === 0) {
+                isLoading = false; 
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+
+            appsToShow.forEach(app => {
+                const isFavorite = favorites.includes(app.id);
+                const favoriteClass = isFavorite ? 'favorited' : '';
+                const favoriteIcon = isFavorite
+                    ? `<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.218l-.022.012-.007.003z" /></svg>`
+                    : `<svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" /></svg>`;
+
+                let badgeColor = 'rgba(100, 116, 139, 0.7)';
+                const cat = (app.category || '').toLowerCase();
+                if (cat.includes('arcade')) badgeColor = 'rgba(139, 92, 246, 0.7)';
+                else if (cat.includes('racing')) badgeColor = 'rgba(239, 68, 68, 0.7)';
+                else if (cat.includes('shooter')) badgeColor = 'rgba(249, 115, 22, 0.7)';
+                else if (cat.includes('puzzle') || cat.includes('strategy')) badgeColor = 'rgba(16, 185, 129, 0.7)';
+                else if (cat.includes('horror')) badgeColor = 'rgba(0, 0, 0, 0.8)';
+                else if (cat.includes('sports')) badgeColor = 'rgba(59, 130, 246, 0.7)';
+
+                const card = document.createElement('div');
+                card.className = 'app-card rounded-lg overflow-hidden cursor-pointer flex flex-col';
+                card.dataset.id = app.id;
+                
+                card.innerHTML = `
+                    <div class="relative w-full aspect-[4/3] bg-gray-200 dark:bg-gray-700">
+                        <img src="${app.thumbnail}" alt="${app.name}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='https://placehold.co/400x300/2a3b4c/ffffff?text=${encodeURIComponent(app.name)}'; this.onerror=null;">
+                        <span class="absolute top-2 right-2 category-badge" style="background:${badgeColor}">${app.category || 'Game'}</span>
+                    </div>
+                    <div class="p-3 flex justify-between items-center mt-auto">
+                        <h3 class="font-semibold text-sm text-t-text truncate pr-2">${app.name}</h3>
+                        <button class="favorite-btn ${favoriteClass} transition-colors flex-shrink-0" data-id="${app.id}" title="Toggle Favorite">
+                            ${favoriteIcon}
+                        </button>
+                    </div>
+                `;
+                fragment.appendChild(card);
+            });
+
+            appGrid.appendChild(fragment);
+            currentPage++;
+            isLoading = false;
+        }
+
+        function handleScroll() {
+            const { scrollTop, clientHeight, scrollHeight } = mainScrollContainer;
+            if (scrollTop + clientHeight >= scrollHeight - 500) renderPage();
+            if (jumpToTopBtn) {
+                if (scrollTop > 300) jumpToTopBtn.classList.remove('hidden');
+                else jumpToTopBtn.classList.add('hidden');
+            }
+        }
+
+        function setupEventListeners() {
+            searchBar.addEventListener('input', () => {
+                if (favoritesBtn) favoritesBtn.classList.remove('active');
+                if (categoryFilter.value === 'favorites') categoryFilter.value = 'all';
+                updateFilterAndRender();
+            });
+            categoryFilter.addEventListener('change', () => {
+                if (favoritesBtn) favoritesBtn.classList.remove('active');
+                updateFilterAndRender();
+            });
+            if (favoritesBtn) {
+                favoritesBtn.addEventListener('click', () => {
+                    if (categoryFilter.value === 'favorites') {
+                        categoryFilter.value = 'all';
+                        favoritesBtn.classList.remove('active');
+                    } else {
+                        categoryFilter.value = 'favorites';
+                        favoritesBtn.classList.add('active');
+                    }
+                    updateFilterAndRender();
+                });
+            }
+            mainScrollContainer.addEventListener('scroll', handleScroll);
+            appGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.app-card'); 
+                if (!card) return; 
+                const favBtn = e.target.closest('.favorite-btn');
+                const appId = card.dataset.id;
+                if (favBtn) {
+                    e.stopPropagation(); 
+                    toggleFavorite(appId);
+                } else {
+                    const app = allApps.find(g => g.id === appId);
+                    if (app && app.content) {
+                        addRecentlyPlayed(app.id); 
+                        launchApp(app.content); 
+                    }
+                }
+            });
+            if (recentlyPlayedGrid) {
+                recentlyPlayedGrid.addEventListener('click', (e) => {
+                    const card = e.target.closest('.recent-app-card');
+                    if (!card) return;
+                    const appId = card.dataset.id;
+                    const app = allApps.find(g => g.id === appId);
+                    if (app && app.content) {
+                        addRecentlyPlayed(app.id); 
+                        launchApp(app.content); 
+                    }
+                });
+            }
+            if (jumpToTopBtn) {
+                jumpToTopBtn.addEventListener('click', () => {
+                    mainScrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+            
+            // --- SETTINGS EVENTS ---
+            settingsBtn.addEventListener('click', () => {
+                settingsModal.classList.remove('hidden');
+            });
+            closeSettingsBtn.addEventListener('click', () => {
+                settingsModal.classList.add('hidden');
+            });
+            settingsModal.addEventListener('click', (e) => {
+                if (e.target === settingsModal) settingsModal.classList.add('hidden');
+            });
+
+            // Theme Switching
+            themePreviews.forEach(p => {
+                p.addEventListener('click', () => {
+                    applyTheme(p.dataset.theme);
+                });
+            });
+
+            // Cloak Switching
+            cloakBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const type = btn.dataset.type;
+                    applyCloak(CLOAK_PRESETS[type]);
+                    showPopupMessage('Cloak updated!');
+                });
+            });
+
+            // Panic Key Setting
+            panicInput.addEventListener('click', () => {
+                panicInput.value = 'Press any key...';
+                const setKey = (e) => {
+                    e.preventDefault();
+                    panicInput.value = e.key;
+                    document.removeEventListener('keydown', setKey);
+                };
+                document.addEventListener('keydown', setKey);
+            });
+            savePanicBtn.addEventListener('click', () => {
+                if (panicInput.value && panicInput.value !== 'Press any key...') {
+                    panicKey = panicInput.value;
+                    localStorage.setItem('oasisPanicKey', panicKey);
+                    currentPanicKeyDisplay.textContent = panicKey;
+                    showPopupMessage('Panic key saved!');
+                }
+            });
+
+            // Panic URL Setting
+            savePanicUrlBtn.addEventListener('click', () => {
+                let url = panicUrlInput.value.trim();
+                if (url) {
+                    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                        url = 'https://' + url;
+                    }
+                    panicUrl = url;
+                    localStorage.setItem('oasisPanicUrl', panicUrl);
+                    panicUrlInput.value = panicUrl;
+                    showPopupMessage('Redirect URL saved!');
+                }
+            });
+
+            // Global Panic Listener
+            document.addEventListener('keydown', handlePanic);
+        }
+
+        function initialize() {
+            appCounter = document.getElementById('app-counter');
+            jumpToTopBtn = document.getElementById('jump-to-top');
+            recentlyPlayedGrid = document.getElementById('recently-played-grid');
+            recentlyPlayedSection = document.getElementById('recently-played-section');
+            favoritesBtn = document.getElementById('favorites-btn'); 
+            
+            // Initialize Settings
+            applyTheme(currentTheme);
+            applyCloak(cloakData);
+            currentPanicKeyDisplay.textContent = panicKey;
+            if (panicUrlInput) panicUrlInput.value = panicUrl;
+
+            const featuredAppLink = document.getElementById('featured-app-link');
+            const defaultFeaturedAppId = 'repo'; 
+            const featuredApp = allApps.find(g => g.id === defaultFeaturedAppId); 
+
+            if (featuredApp && featuredAppLink) {
+                const featuredImageDiv = featuredAppLink.querySelector('.bg-cover');
+                const featuredTitle = featuredAppLink.querySelector('h2');
+                featuredAppLink.removeAttribute('href');
+                featuredAppLink.style.cursor = 'pointer';
+                if (featuredImageDiv) {
+                    const imageUrl = featuredApp.bannerImage ? featuredApp.bannerImage : featuredApp.thumbnail;
+                    featuredImageDiv.style.backgroundImage = `url('${imageUrl}')`;
+                }
+                if (featuredTitle) featuredTitle.textContent = featuredApp.name;
+                featuredAppLink.addEventListener('click', (e) => {
+                    if (e.button === 0 && !e.ctrlKey && !e.metaKey) { 
+                        e.preventDefault(); 
+                        addRecentlyPlayed(featuredApp.id); 
+                        launchApp(featuredApp.content); 
+                    }
+                });
+                featuredAppLink.classList.remove('hidden');
+            } else if (featuredAppLink) {
+                featuredAppLink.classList.add('hidden');
+            }
+
+            loadFavorites();
+            loadRecentlyPlayed();
+            renderRecentlyPlayed(); 
+            populateCategories();
+            setupEventListeners();
+            updateFilterAndRender(); 
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const appsListUrl = 'https://cdn.jsdelivr.net/gh/Blurtuz/assets2@refs/heads/main/games33.json';
+            fetch(appsListUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+                    return response.text();
+                })
+                .then(text => {
+                    if (!text) throw new Error("The 'apps.json' file is empty.");
+                    try {
+                        allApps = JSON.parse(text);
+                        initialize();
+                    } catch (e) {
+                        throw new Error(`Failed to parse JSON: ${e.message}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching app list:', error);
+                    const appGrid = document.getElementById('app-grid');
+                    if (appGrid) {
+                        appGrid.innerHTML = `<p class="col-span-full text-center text-red-500 font-semibold py-16"><strong class="text-xl block">Could not load app list.</strong>${error.message}</p>`;
+                    }
+                });
+        });
+    </script>
+</body>
+</html>
